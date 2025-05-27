@@ -1,0 +1,32 @@
+## Bus Booking System API
+
+## authRouter - Customer
+- POST customer/signup
+- POST customer/login
+- POST customer/logout
+
+## authRouter - Vendor
+- POST vendor/signup
+- POST vendor/login
+- POST vendor/logout
+
+## profile - customer/vendor
+- GET /profile
+- PATCH /profile/edit
+- PATCH /profile/changePassword
+
+## add/edit bus
+- POST vendor/addBusDetail/:vendorId
+- PATCH vendor/editBusDetail/:vendorId/:busId
+
+## Users
+- GET customer/getAll
+- GET vendor/getAll
+
+## Bus
+- GET bus/getAll
+- GET vendor/getAllBus/:vendorId
+- GET bus/origin
+- GET bus/destination
+
+

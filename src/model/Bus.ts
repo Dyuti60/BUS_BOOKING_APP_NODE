@@ -1,0 +1,94 @@
+import mongoose, {Document,Schema} from "mongoose";
+
+export interface IBus extends Document{
+    busName:string,
+    busNumber:string,
+    vendorId:mongoose.Schema.Types.ObjectId,
+    origin:string,
+    destination:string,
+    departure:string,
+    arrival:string
+    price:Number,
+    stops:[string],
+    amenities:[string],
+    description:string
+    status:string
+}
+const BusSchema: Schema = new Schema({
+    busName:{
+        type:String,
+        minLength:4,
+        maxLength:20,
+        uppercase:true,
+        required:true
+    },
+    busNumber:{
+        type:String,
+        minLength:4,
+        maxLength:10,
+        unique:true,
+        uppercase:true,
+        required:true
+    },
+    vendorId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vendor',
+        uppercase:true,
+        required:true
+    },
+    origin:{
+        type:String,
+        uppercase:true,
+        minLength:2,
+        maxLength:15,
+        required:true
+    },
+    destination:{
+        type:String,
+        uppercase:true,
+        minLength:2,
+        maxLength:15,
+        required:true
+    },
+    departure:{
+        type:String,
+        minLength:4,
+        maxLength:6,
+        required:true
+    },
+    arrival:{
+        type:String,
+        required:true
+    },
+    price:{
+        type:Number,
+        required:true
+    },
+    stops:{
+        type:[String],
+        required:true
+    },
+    amenities:{
+        type:[String],
+        required:true
+    },
+    description:{
+        type:String,
+        maxLength:300,
+        required:true,
+    },
+    status:{
+        type:String,
+        enum:{
+            values:["Active","InActive","Cancelled"],
+            message:'{VALUE} has invalid status type'
+        },
+        default:"Active",
+        required:true
+    },
+},    
+{
+        timestamps:true
+    }
+)
+export const Bus = mongoose.model<IBus>('Bus',BusSchema)
