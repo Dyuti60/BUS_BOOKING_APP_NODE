@@ -1,14 +1,15 @@
 import mongoose, {Document, Schema} from "mongoose";
 export interface ISeat extends Document{
     busId:mongoose.Schema.Types.ObjectId,
-    seatNumber: string,
+    seatNumber: String,
     seatType: 'REGULAR' | 'SLEEPER' | 'SEMI-SLEEPER',
     isAvailable:boolean,
     row:Number,
     column:Number,
-    fareModifier?:Number
+    fareModifier?:Number,
+    fareModifierFlag?:Boolean
 }
-const SeatSchema: Schema = new Schema({
+const SeatSchema: Schema = new Schema<ISeat>({
     busId:{
         type:mongoose.Schema.Types.ObjectId,
         required:true,
@@ -44,6 +45,11 @@ const SeatSchema: Schema = new Schema({
     fareModifier:{
         type:Number,
         default:0
+    },
+    fareModifierFlag:{
+        type:Boolean,
+        default:"Neutral",
+        enum: ['Neutral','Positive','Negative']
     }
 })
-export const Seat = mongoose.model('Seat',SeatSchema)
+export const Seat = mongoose.model<ISeat>('Seat',SeatSchema)

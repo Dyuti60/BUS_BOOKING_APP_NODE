@@ -1,6 +1,7 @@
 import mongoose,{Document,Schema} from "mongoose";
 export interface IPayment extends Document{
     bookingId:mongoose.Schema.Types.ObjectId,
+    seatId:mongoose.Schema.Types.ObjectId,
     customerId:mongoose.Schema.Types.ObjectId,
     amount:number,
     paymentMethod:string,
@@ -10,8 +11,13 @@ export interface IPayment extends Document{
     paidOnDate:Date,
     refundOnDate:Date
 }
-const PaymentSchema:Schema = new Schema({
+const PaymentSchema:Schema = new Schema<IPayment>({
     bookingId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Booking',
+        required:true
+    },
+    seatId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Booking',
         required:true
@@ -49,5 +55,9 @@ const PaymentSchema:Schema = new Schema({
     refundOnDate:{
         type:Date
     }
-})
-export const Payment = mongoose.model('Payment',PaymentSchema)
+},
+{
+    timestamps:true
+}
+)
+export const Payment = mongoose.model<IPayment>('Payment',PaymentSchema)

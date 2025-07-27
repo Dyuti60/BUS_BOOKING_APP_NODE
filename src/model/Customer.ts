@@ -1,5 +1,9 @@
 import mongoose, {Document, Schema} from "mongoose";
+import { userInfo } from "os";
 import validator from 'validator'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+import { promises } from "dns";
 export interface ICustomer extends Document{
     firstName:string,
     lastName:string,
@@ -11,7 +15,12 @@ export interface ICustomer extends Document{
     state:string,
     city:string
 }
-const CustomerSchema: Schema = new Schema({
+export interface ICustomerMethods {
+  getJWT(): string;
+  getCustomerPasswordVerified(password:string):Promise<boolean>
+}
+export type CustomerDocument = Document & ICustomer & ICustomerMethods;
+const CustomerSchema: Schema = new Schema<ICustomer, mongoose.Model<ICustomer, {}, ICustomerMethods>>({
     firstName: {
         type:String,
         minLength:4,
@@ -79,5 +88,21 @@ const CustomerSchema: Schema = new Schema({
         maxLength:15,
         required:true
     }
+},
+{
+    timestamps:true
 })
-export const Customer = mongoose.model<ICustomer>('Customer',CustomerSchema)
+
+CustomerSchema.methods.getJWT = function():string{
+    const customer = this
+    const token = jwt.sign({_id:customer._id},"Customer$Bus$Booking$System$720",{expiresIn:"1h"})
+    return token
+}
+CustomerSchema.methods.getCustomerPasswordVerified = async function(passwordInputValue:string){
+    const customer = this
+    const passwordHash = customer.password
+    const isPasswordValid = await bcrypt.compare(passwordInputValue,passwordHash)
+    return isPasswordValid
+}
+
+export const Customer = mongoose.model<ICustomer, mongoose.Model<ICustomer, {}, ICustomerMethods>>('Customer',CustomerSchema)

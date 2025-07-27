@@ -1,5 +1,7 @@
 import mongoose, {Document,Schema} from "mongoose";
-import validator, { isLowercase } from 'validator'
+import validator from 'validator'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 export interface IVendor extends Document{
     vendorName:string,
     vendorEmail:string,
@@ -11,7 +13,13 @@ export interface IVendor extends Document{
     vendorState:string,
     vendorCity:string
 }
-const VendorSchema: Schema = new Schema({
+export interface IVendorMethods{
+    getJWT():string
+    getVendorPasswordVerified(password:string):Promise<Boolean>
+}
+export type VendorDocument = Document & IVendor & IVendorMethods;
+
+const VendorSchema: Schema = new Schema<IVendor, mongoose.Model<VendorDocument>, IVendorMethods>({
     vendorName:{
         type:String,
         minLength:4,
@@ -81,5 +89,18 @@ const VendorSchema: Schema = new Schema({
         maxLength:15,
         type:String,
     }
+},{
+    timestamps:true
 })
-export const Vendor = mongoose.model('Vendor',VendorSchema)
+VendorSchema.methods.getJWT = function():string{
+    const vendor =this
+    const token = jwt.sign({_id:vendor._id},"$Vendor$Bus$Booking$System$420",{expiresIn:"1h"})
+    return token
+}
+VendorSchema.methods.getVendorPasswordVerified = async function(passwordInputValue:string){
+    const vendor = this
+    const passwordHash = vendor.vendorPassword
+    const isPasswordValid = await bcrypt.compare(passwordInputValue,passwordHash)
+    return isPasswordValid 
+}
+export const Vendor = mongoose.model<VendorDocument>('Vendor',VendorSchema)

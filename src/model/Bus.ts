@@ -4,17 +4,24 @@ export interface IBus extends Document{
     busName:string,
     busNumber:string,
     vendorId:mongoose.Schema.Types.ObjectId,
+    busSeatRows:number,
+    busSeatColumns:number,
+    totalSeats:number,
+    additionalSeats:number,
     origin:string,
+    midOrigin:string,
     destination:string,
     departure:string,
     arrival:string
-    price:Number,
+    price:number,
+    midPrice:number,
     stops:[string],
     amenities:[string],
     description:string
     status:string
 }
-const BusSchema: Schema = new Schema({
+
+const BusSchema: Schema = new Schema<IBus>({
     busName:{
         type:String,
         minLength:4,
@@ -36,12 +43,45 @@ const BusSchema: Schema = new Schema({
         uppercase:true,
         required:true
     },
+    busSeatRows:{
+        type:Number,
+        min:1,
+        max:10,
+        required:true
+    },
+    busSeatColumns:{
+        type:Number,
+        min:1,
+        max:4,
+        required:true
+    },
+    additionalSeats:{
+        type:Number,
+        default:0,
+        max:3
+    },
+    totalSeats:{
+        type:Number,
+        required:true,
+        validate:{
+            validator: function(this:IBus,value:number){
+                return value==(this.busSeatRows*this.busSeatColumns) + this.additionalSeats
+            },
+            message:"Total Seat in a bus cant be greater than bus row multiplied by bus columns plus additional seats"
+        }
+    },
     origin:{
         type:String,
         uppercase:true,
         minLength:2,
         maxLength:15,
         required:true
+    },
+    midOrigin:{
+        type:String,
+        uppercase:true,
+        minLength:2,
+        maxLength:15
     },
     destination:{
         type:String,
@@ -63,6 +103,21 @@ const BusSchema: Schema = new Schema({
     price:{
         type:Number,
         required:true
+    },
+    midPrice:{
+        type:Number,
+        validate:{
+            validator(this:IBus,value:number|undefined){
+                if(this.midOrigin && (value === undefined || value === null)){
+                    return false
+                }
+                if(!this.midOrigin && value !== undefined && value !==null){
+                    return false
+                }
+                return true
+            },
+            message:"midPrice is mandatory when midOrigin is defined"
+        }
     },
     stops:{
         type:[String],

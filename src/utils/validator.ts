@@ -12,5 +12,8 @@ export const validateCustomerSignUpData = (req: Request<{}, {}, ICustomer>)=>{
     }
 }
 export const validateVendorSignUpData = ()=>{
+
+}
+export const validateAddBusDetails = ()=>{
     
 }
