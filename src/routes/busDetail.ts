@@ -96,7 +96,7 @@ busDetailsRoute.get('/busDetails/:busID',async(req:VendorRequest,res:Response)=>
         _id:busId
     })
     res.status(200).json({
-        message:"Bus by bus id under vendor fetched successfully",
+        message:"Bus Details by bus id fetched successfully",
         data:busesUnderVendor
     })
 })
@@ -181,6 +181,7 @@ busDetailsRoute.get('/getAllBusBetween/:origin/:destination',async(req:VendorReq
         data:getAllBuses
     })
 })
+
 busDetailsRoute.get('/vendor/getAllBusByDepartureTime',vendorAuth,async(req:VendorRequest,res:Response)=>{
     const vendor = req.vendor
     const {minDepartureTime, maxDepartureTime}=req.query
